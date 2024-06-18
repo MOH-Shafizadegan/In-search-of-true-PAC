@@ -1,4 +1,4 @@
-function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, f_step, window_type)
+function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_type)
     
     % x1: signal 1
     % x1: signal 2
@@ -10,7 +10,6 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, f_step, w
     % window_type = causal , anticausal , semi-causal
     
     [~,sz] = size(x1) ;
-    f = fGamma(1) : f_step : fGamma(2) ; 
     if window_type == "causal"
         s_range = interval+1 : step : sz;
         start_idx = interval;
@@ -25,26 +24,25 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, f_step, w
         end_idx = round(interval/2);
     end
     
-    table = zeros(max(size(s_range)),max(size(f))) ; 
-    S = 1 ; 
+    w1 = nf_cwt(x1,Fs); 
+    w2 = nf_cwt(x2,Fs);
+    
+    table = [] ; 
+    
     for s = s_range
-        K = 1 ; 
-        w1 = rid_rihaczek(x1(s-start_idx : s-end_idx),Fs) ; 
-        w2 = rid_rihaczek(x2(s-start_idx : s-end_idx),Fs) ; 
-        for f = fGamma(1) : f_step : fGamma(2) 
-            MVL = 0;
-            for i = thetaBand(1):thetaBand(2)
-                MVL = MVL + tfMVL(w1, w2, f, i);
-            end
-            table(S,K) = MVL / (thetaBand(2)-thetaBand(1) + 1) ; 
-            K = K + 1 ; 
-        end
-        S = S + 1 ;
+        
+        window_idx = s-start_idx : s-end_idx;
+        
+        [MVL, f_high, f_low] = tfMVL(w1, w2, fGamma, thetaBand, window_idx);
+        table = [table; mean(MVL, 2)'];
+        
     end
         
-    out = struct( ...
-        's', s_range, ...
-        'table', table ...
+    out = struct(           ...
+        's', s_range,       ...
+        'table', table,     ...
+        'f_high', f_high,   ...
+        'f_low', f_low      ...
     );
     
 end

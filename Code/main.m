@@ -51,10 +51,10 @@ ylabel('Amplitude');
 %% PAC comodu
 
 % PAC Method:
-%     - Old rid-rihaczek function (supposed to have bug)
-%     - First Windowing the signal, then calculating tf-decomposition
+%     - New rid-rihaczek function (Neuro_Freq)
+%     - First calculating tf-decomposition, then Windowing
 
-PAC_mat_noise = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);
+[PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);
 PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs);
 PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs);
 
@@ -62,17 +62,17 @@ PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs);
 
 range = max([max(max(PAC_mat_sig1)) max(max(PAC_mat_sig2)) max(max(PAC_mat_noise))])
 
-plot_comodulogram(PAC_mat_noise, 20:90, 2:13, [0 range])
+plot_comodulogram(PAC_mat_noise, f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-sig-randomNoise');
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig1, 20:90, 2:13, [0 range])
+plot_comodulogram(PAC_mat_sig1, f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig2, 20:90, 2:13, [0 range])
+plot_comodulogram(PAC_mat_sig2, f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
 save_fig(save_path, fig_title);
@@ -89,7 +89,7 @@ gamma_band = [35 45];
 
 PAC = tfInTrialGram(signal, signal, Fs, interval,...
                            w_step, theta_band, ...
-                           gamma_band , 1, window_type);
+                           gamma_band, window_type);
 
 PAC_dyn = mean(PAC.table, 2);
 
@@ -133,10 +133,10 @@ coupling2_PAC = zeros(sample_size, 1);
 for i=1:sample_size
     PAC1 = tfInTrialGram(coupling1_sigs(i,:), coupling1_sigs(i,:), Fs, Fs-1,...
                            1, theta_band, ...
-                           gamma_band , 1, window_type);
+                           gamma_band, window_type);
     PAC2 = tfInTrialGram(coupling2_sigs(i,:), coupling2_sigs(i,:), Fs, Fs-1,...
                            1, theta_band, ...
-                           gamma_band , 1, window_type);
+                           gamma_band, window_type);
     
     coupling1_PAC(i) = mean(PAC1.table, 2);
     coupling2_PAC(i) = mean(PAC2.table, 2);
