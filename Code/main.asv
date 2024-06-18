@@ -51,12 +51,15 @@ ylabel('Amplitude');
 %% PAC comodu
 
 % PAC Method:
-%     - Old rid-rihaczek function (supposed to have bug)
+%     - New rid-rihaczek function (Neuro_Freq)
 %     - First Windowing the signal, then calculating tf-decomposition
-
-PAC_mat_noise = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);
-PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs);
-PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs);
+cfg = struct(...
+    'interval', Fs-1, ...
+    'w_step', 0 ...
+    );
+PAC_mat_noise = calc_PAC_mat(noise, noise, cfg, 2:13, 20:90, Fs);
+PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, cfg, 2:13, 20:90, Fs);
+PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, cfg, 2:13, 20:90, Fs);
 
 %% PAC comodu Visualization
 
