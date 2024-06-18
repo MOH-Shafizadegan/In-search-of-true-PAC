@@ -51,7 +51,7 @@ ylabel('Amplitude');
 %% PAC comodu
 
 % PAC Method:
-%     - New rid-rihaczek function (Neuro_Freq)
+%     - CWT (Neuro_Freq)
 %     - First calculating tf-decomposition, then Windowing
 
 [PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);

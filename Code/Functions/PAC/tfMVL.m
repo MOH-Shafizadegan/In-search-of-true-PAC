@@ -19,4 +19,18 @@ function [tf_canolty, f_high, f_low] = tfMVL(w1,w2,high_freq,low_freq, window_id
 
     tf_canolty = (calc_MVL(Phase,Amp));
     
+    n_synth = 200;
+    synth_canolty = zeros(size(tf_canolty, 1), size(tf_canolty, 2), n_synth);
+    for i=1:n_synth
+        Amp_permuted = Amp(:, randperm(size(Amp, 2)));
+        synth_canolty(:, :, i) = calc_MVL(Phase,Amp_permuted);
+    end
+    
+    mean_synth = mean(synth_canolty, 3);
+    std_synth = std(synth_canolty, 0, 3);
+    
+    tf_canolty = (tf_canolty - mean_synth) ./ std_synth;
+    % Apply threshold to set negative values to zero
+    tf_canolty = max(0, tf_canolty);
+    
 end
