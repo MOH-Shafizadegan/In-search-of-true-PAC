@@ -51,7 +51,7 @@ ylabel('Amplitude');
 %% PAC comodu
 
 % PAC Method:
-%     - Old rid-rihaczek function (supposed to have bug)
+%     - corrected rid-rihaczek function (ifft - fft2)
 %     - First Windowing the signal, then calculating tf-decomposition
 
 PAC_mat_noise = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);

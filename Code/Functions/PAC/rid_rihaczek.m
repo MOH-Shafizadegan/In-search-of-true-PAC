@@ -8,7 +8,7 @@ function [tfd]=rid_rihaczek(x,fbins)
     amb = zeros(tbins);
 
     for tau = 1:tbins
-        amb(tau,:) = (conj(x) .* x([tau:tbins 1:tau-1]) );
+        amb(tau,:) = ifft(conj(x) .* x([tau:tbins 1:tau-1]) );
     end
 
     ambTemp = [amb(:,tbins/2+1:tbins) amb(:,1:tbins/2)];
@@ -31,6 +31,6 @@ function [tfd]=rid_rihaczek(x,fbins)
         A = ambf; 
     end
 
-    tfd = fft(A);
+    tfd = fft2(A);
 
 end
