@@ -24,8 +24,8 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_ty
         end_idx = round(interval/2);
     end
     
-    w1 = nf_ridrihaczek(x1,Fs, 1); 
-    w2 = nf_ridrihaczek(x2,Fs, 1);
+    w1 = nf_cwt(x1,Fs); 
+    w2 = nf_cwt(x2,Fs);
     
     table = [] ; 
     
