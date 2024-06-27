@@ -8,16 +8,16 @@ addpath('./Functions/Visualization')
 
 Fs = 1000;               % Sampling frequency (Hz)
 SNR = 1;                 % Signal to Noise Ratio
-addnoise_var = 0.2;     % Additive noise to the couple signal which is
+addnoise_var = 0.2;      % Additive noise to the couple signal which is
                          % needed for precise PAC calculation (In SNR=inf
                          % the PAC methods won't work well)
 
-T1=1; K_f_p1=1; K_f_a1=1; f_p1=5; f_a1=40; c_frac1=0;
-sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
+T1=1; K_f_p1=1; K_f_a1=1; f_p1=5; f_a1=40; c_frac1=0; phi_c1 = rand()*2*pi;
+sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c1, Fs);
 sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
-T2=1; K_f_p2=1; K_f_a2=1; f_p2=9; f_a2=60; c_frac2=0;
-sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
+T2=1; K_f_p2=1; K_f_a2=1; f_p2=9; f_a2=60; c_frac2=0; phi_c2 = rand()*2*pi;
+sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, phi_c2, Fs);
 sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
 n1_pow = mean(sig1.^2) * 10^(-SNR/10);
@@ -35,7 +35,7 @@ signal = [noise sig1 sig2 sig1_noisy sig2_noisy];
 t = 0:1/Fs:1-(1/Fs);
 t_all = 0:1/Fs:length(signal)/Fs-(1/Fs);
 
-figure;
+figure('WindowState', 'maximized');
 subplot(4,1,1)
 plot(t, noise(1:length(t)));
 title('Random Gussian Noise');
@@ -60,10 +60,12 @@ title("All Signal (SNR: "+SNR+"dB)");
 xlabel('Time (s)');
 ylabel('Amplitude');
 
+save_fig('./Results/Sig/', 'Synthesized Signal');
+
 %% PAC comodu
 
 % PAC Method:
-%     - New rid-rihaczek function (Neuro_Freq)
+%     - Wavelet tf-decomposition
 %     - First calculating tf-decomposition, then Windowing
 
 [PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);
@@ -136,8 +138,9 @@ sample_size = 100;
 T1 = 1;
 coupling1_sigs = zeros(sample_size, T1*Fs);
 for i=1:sample_size
-    K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([4, 7], 1); f_a1=randi([38, 42], 1); c_frac1=0;
-    sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
+    K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([4, 7], 1);
+    f_a1=randi([38, 42], 1); phi_c = rand()*2*pi; c_frac1=0;
+    sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c, Fs);
     coupling1_sigs(i,:) = sig;
 end
 
@@ -145,8 +148,9 @@ end
 T2 = 1;
 coupling2_sigs = zeros(sample_size, T2*Fs);
 for i=1:sample_size
-    K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([8, 11], 1); f_a1=randi([55, 65], 1); c_frac1=0;
-    sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
+    K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([8, 11], 1);
+    f_a1=randi([55, 65], 1); phi_c = rand()*2*pi; c_frac1=0;
+    sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c, Fs);
     coupling2_sigs(i,:) = sig;
 end
 
@@ -168,4 +172,6 @@ end
 %% Pvalue
 
 [~, pval] = ttest2(coupling2_PAC, coupling1_PAC, 'Tail', 'left', 'Vartype', 'unequal');
+disp('p-value =')
 disp(pval)
+save('./Results/p-value.txt', 'pval', '-ascii');  % Saves variable 'x' to 'data.txt'
