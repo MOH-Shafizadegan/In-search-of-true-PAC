@@ -116,7 +116,6 @@ colormap jet
 colorbar
 
 
-
 %% Statistical analysis
 
 % coupling 1: fp=[4 7], fa=[38 42]
