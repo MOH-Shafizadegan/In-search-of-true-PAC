@@ -24,8 +24,8 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_ty
         end_idx = round(interval/2);
     end
     
-    w1 = nf_cwt(x1,Fs); 
-    w2 = nf_cwt(x2,Fs);
+    w1 = nf_cwt(x1, Fs, max(fGamma)); 
+    w2 = nf_cwt(x2, Fs, max(fGamma));
     
     table = [] ; 
     
