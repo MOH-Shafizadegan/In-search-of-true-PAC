@@ -7,44 +7,56 @@ addpath('./Functions/Visualization')
 %% Generate signal
 
 Fs = 1000;               % Sampling frequency (Hz)
+SNR = 1;                 % Signal to Noise Ratio
+addnoise_var = 0.02;     % Additive noise to the couple signal which is
+                         % needed for precise PAC calculation (In SNR=inf
+                         % the PAC methods won't work well)
 
 T1=1; K_f_p1=2; K_f_a1=2; f_p1=5; f_a1=40; c_frac1=0;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
+sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
 T2=1; K_f_p2=2; K_f_a2=2; f_p2=9; f_a2=60; c_frac2=0;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
+sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
-noise = 1.2 * randn(size(sig1));
+noise = 1.2 * randn(1,length([sig1,sig2]));
 
-signal = [noise sig1 sig2];
+n1_pow = mean(sig1.^2) * 10^(-SNR/10);
+n2_pow = mean(sig2.^2) * 10^(-SNR/10);
+
+sig1_noisy = sig1 + n1_pow * randn(1,length(sig1));
+sig2_noisy = sig2 + n2_pow * randn(1,length(sig2));
+
+signal = [noise sig1 sig2 sig1_noisy sig2_noisy];
 
 %% Visualize signal
 
 t = 0:1/Fs:1-(1/Fs);
-t_all = 0:1/Fs:3-(1/Fs);
+t_all = 0:1/Fs:length(signal)/Fs-(1/Fs);
 
 figure;
 subplot(4,1,1)
-plot(t, noise);
+plot(t, noise(1:length(t)));
 title('Random Gussian Noise');
 xlabel('Time (s)');
 ylabel('Amplitude');
 
 subplot(4,1,2)
-plot(t, sig1);
+plot(t, sig1(1:length(t)));
 title('fp=5, fa=40');
 xlabel('Time (s)');
 ylabel('Amplitude');
 
 subplot(4,1,3)
-plot(t, sig2);
+plot(t, sig2(1:length(t)));
 title('fp=9, fa=60');
 xlabel('Time (s)');
 ylabel('Amplitude');
 
 subplot(4,1,4)
 plot(t_all, signal);
-title('All Signal');
+title("All Signal (SNR: "+SNR+"dB)");
 xlabel('Time (s)');
 ylabel('Amplitude');
 
