@@ -113,7 +113,7 @@ switch lower(string(method))
     % Finding PAC at each window
     parfor ti = 1:length(time)
         disp("Calculation of PAC: Progress: "+ti/length(time)*100+"%")
-        PAC(ti,:,:) = myPAC_MI(squeeze(Phase_temp(:,ti,:)),squeeze(Amp_temp(:,ti,:)) , nbins, nperm);
+        PAC(ti,:,:) = calc_MI(squeeze(Phase_temp(:,ti,:)),squeeze(Amp_temp(:,ti,:)) , nbins, nperm);
     end
 
     case "rid-rihaczek"
@@ -150,7 +150,7 @@ switch lower(string(method))
             Phase = tfd1.phase(ismember(ff,fph),:);
             Amp = tfd2.power(ismember(ff,famp),:);
             
-            PAC(ti,:,:) = myPAC_MI(Phase, Amp, nbins, nperm);
+            PAC(ti,:,:) = calc_MI(Phase, Amp, nbins, nperm);
         end
 
     otherwise
