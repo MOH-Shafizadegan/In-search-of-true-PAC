@@ -8,13 +8,13 @@ addpath('./Functions/Visualization')
 
 Fs = 1000;               % Sampling frequency (Hz)
 
-T1=1; K_f_p1=0; K_f_a1=2; f_p1=5; f_a1=40; c_frac1=0;
+T1=1; K_f_p1=2; K_f_a1=2; f_p1=5; f_a1=40; c_frac1=0;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
 
-T2=1; K_f_p2=0; K_f_a2=2; f_p2=9; f_a2=60; c_frac2=0;
+T2=1; K_f_p2=2; K_f_a2=2; f_p2=9; f_a2=60; c_frac2=0;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
 
-noise = 0.4 * randn(size(sig1));
+noise = 1.2 * randn(size(sig1));
 
 signal = [noise sig1 sig2];
 
