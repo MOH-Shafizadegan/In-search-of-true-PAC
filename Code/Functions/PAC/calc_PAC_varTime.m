@@ -22,6 +22,12 @@ function [PAC,time,fph,famp] = calc_PAC_varTime(sig_ph,sig_amp,Fs,fph,famp,twin,
 % - nperm: Number of surrogates for permutation test. Leave it 0 if you
 %          don't want use permutation tests.
 % - nbins: The number of phase bins for calculation of Modulaiton Index (MI)
+% 
+% Outputs:
+% - PAC: A 3D tensor that is [time]*[phase_freq]*[amplitude_freq]
+% - time: The time vector in seconds.
+% - fph: Phase frequency vector in hertz.
+% - famp: Amplitude frequency vector in hertz.
 %
 % by Matin Arman Mehr
 % E-Mail me for any issues: matinarmanmehr@proton.me
@@ -106,7 +112,7 @@ switch lower(string(method))
 
     % Finding PAC at each window
     parfor ti = 1:length(time)
-        disp(ti/length(time)*100+"%")
+        disp("Calculation of PAC: Progress: "+ti/length(time)*100+"%")
         PAC(ti,:,:) = myPAC_MI(squeeze(Phase_temp(:,ti,:)),squeeze(Amp_temp(:,ti,:)) , nbins, nperm);
     end
 

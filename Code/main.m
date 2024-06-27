@@ -91,19 +91,18 @@ save_fig(save_path, fig_title);
 
 %% PAC dynamic
 
-% We just want to detect the first coupling
+% Checkout the new funcitons results
 
-interval = 0.2 * Fs -1;
-w_step = 0.1 * Fs;
-window_type = 'causal';
-theta_band = [4 8];
-gamma_band = [35 45];
+twin = 1; % Window size in seconds
+tovp = 0.95; % Overlap percentage
+fph = [4,8]; % Phase frequency range
+famp = [20,100]; % Amplitude frequcny range
+method = 'wavelet';
+fres_param = 10;
+nperm = 0;
+nbins = 18;
 
-PAC = tfInTrialGram(signal, signal, Fs, interval,...
-                           w_step, theta_band, ...
-                           gamma_band, window_type);
-
-PAC_dyn = mean(PAC.table, 2);
+[PAC, fph_vec, famp_vec] = calc_PAC_varTime(signal,signal,Fs,fph,famp,twin,tovp,method,fres_param,nperm,nbins);
 
 %% Viusalize the PAC dynamic
 
