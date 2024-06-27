@@ -7,7 +7,7 @@ function plot_comodulogram(PAC_mat,high,low, color_range)
     %   low       : Low frequency range for plotting the comodulogram
 
     % plot comodulogram
-    figure('WindowState', 'maximized', 'visible', 'off');
+    figure('WindowState', 'maximized');
     xticks = low;
     yticks=high;
     
