@@ -12,9 +12,11 @@ addnoise_var = 0.2;     % Additive noise to the couple signal which is
                          % needed for precise PAC calculation (In SNR=inf
                          % the PAC methods won't work well)
 
+T1 = 1; K_f_p1 = 1; K_f_a1 = 1; f_p1 = 5; f_a1 = 40; c_frac1 = 0;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
 sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
+T2 = 1; K_f_p2 = 1; K_f_a2 = 1; f_p2 = 9; f_a2 = 60; c_frac2 = 0;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
 sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
