@@ -7,23 +7,23 @@ addpath('./Functions/Visualization')
 %% Generate signal
 
 Fs = 1000;               % Sampling frequency (Hz)
-SNR = 1;                 % Signal to Noise Ratio
-addnoise_var = 0.02;     % Additive noise to the couple signal which is
+SNR = 0;                 % Signal to Noise Ratio
+addnoise_var = 0.1;     % Additive noise to the couple signal which is
                          % needed for precise PAC calculation (In SNR=inf
                          % the PAC methods won't work well)
 
-T1=1; K_f_p1=2; K_f_a1=2; f_p1=5; f_a1=40; c_frac1=0;
+T1=1; K_f_p1=1; K_f_a1=1; f_p1=5; f_a1=40; c_frac1=0;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
 sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
-T2=1; K_f_p2=2; K_f_a2=2; f_p2=9; f_a2=60; c_frac2=0;
+T2=1; K_f_p2=1; K_f_a2=1; f_p2=9; f_a2=60; c_frac2=0;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
 sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
-noise = 1.2 * randn(1,length([sig1,sig2]));
-
 n1_pow = mean(sig1.^2) * 10^(-SNR/10);
 n2_pow = mean(sig2.^2) * 10^(-SNR/10);
+
+noise = max(n1_pow,n2_pow) * randn(1,length([sig1,sig2]));
 
 sig1_noisy = sig1 + n1_pow * randn(1,length(sig1));
 sig2_noisy = sig2 + n2_pow * randn(1,length(sig2));
@@ -93,29 +93,28 @@ save_fig(save_path, fig_title);
 
 % Checkout the new funcitons results
 
-twin = 1; % Window size in seconds
+twin = 0.5; % Window size in seconds
 tovp = 0.95; % Overlap percentage
-fph = [4,8]; % Phase frequency range
+fph = [3,10]; % Phase frequency range
 famp = [20,100]; % Amplitude frequcny range
 method = 'wavelet';
-fres_param = 10;
+fres_param = 16;
 nperm = 0;
 nbins = 18;
 
-[PAC, fph_vec, famp_vec] = calc_PAC_varTime(signal,signal,Fs,fph,famp,twin,tovp,method,fres_param,nperm,nbins);
+[PAC, time_PAC, fph_vec, famp_vec] = calc_PAC_varTime(signal,signal,Fs,fph,famp,twin,tovp,method,fres_param,nperm,nbins);
 
-%% Viusalize the PAC dynamic
+% Getting mean over phase frequency
+PAC_m = squeeze(mean(PAC,2));
 
-figure;
-tint = PAC.s / Fs * 1000;
-plot(tint, PAC_dyn, 'linewidth', 2);
-xlabel('time');
-ylabel('PAC');
-xlim([0 3000])
+% Viusalize the PAC dynamic
 
-save_path = './Results/PAC_dyn/';
-fig_title = 'PAC-dyn-sig';
-save_fig(save_path, fig_title);
+figure('Units','normalized','Position',[0.1, 0.2, 0.5, 0.5])
+pcolor(time_PAC, famp_vec, PAC_m')
+shading interp
+colormap jet
+colorbar
+
 
 
 %% Statistical analysis
