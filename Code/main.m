@@ -7,12 +7,16 @@ addpath('./Functions/Visualization')
 %% Generate signal
 
 Fs = 1000;               % Sampling frequency (Hz)
-SNR = 1;                 % Signal to Noise Ratio
+SNR = 0;                 % Signal to Noise Ratio
 addnoise_var = 0.2;     % Additive noise to the couple signal which is
                          % needed for precise PAC calculation (In SNR=inf
                          % the PAC methods won't work well)
 
+<<<<<<< HEAD
 T1 = 1; K_f_p1 = 1; K_f_a1 = 1; f_p1 = 5; f_a1 = 40; c_frac1 = 0;                         
+=======
+T1 = 1; K_f_p1 = 1; K_f_a1 = 1; f_p1 = 5; f_a1 = 40; c_frac1 = 0;
+>>>>>>> 6435400d07a5a75804d27b90fe005f50299ec161
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
 sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
@@ -28,7 +32,7 @@ noise = max(n1_pow,n2_pow) * randn(1,length(sig1));
 sig1_noisy = sig1 + n1_pow * randn(1,length(sig1));
 sig2_noisy = sig2 + n2_pow * randn(1,length(sig2));
 
-signal = [noise sig1 sig2 sig1_noisy sig2_noisy];
+signal = [noise noise sig1 sig2 sig1_noisy sig2_noisy noise noise];
 
 %% Visualize signal
 
@@ -93,18 +97,15 @@ save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
 % save_fig(save_path, fig_title);
 
-%% PAC dynamic
+%% PAC dynamics
 
 % Checkout the new funcitons results
 
-twin = 0.5; % Window size in seconds
+twin = 0.8; % Window size in seconds
 tovp = 0.95; % Overlap percentage
 fph = [3,10]; % Phase frequency range
 famp = [20,100]; % Amplitude frequcny range
 method = 'wavelet';
-fres_param = 32;
-nperm = 50;
-nbins = 9;
 
 [PAC, time_PAC, fph_vec, famp_vec] = calc_PAC_varTime(signal,signal,Fs,fph,famp,twin,tovp,method,fres_param,nperm,nbins);
 
@@ -145,12 +146,13 @@ colormap jet
 colorbar
 xlabel('Time (s)')
 ylabel('f_{Amp} (Hz)')
-title('Dynamics of PAC')
+title("Dynamics of PAC (SNR="+SNR+"dB)")
 
-xline(T1,'r--',LineWidth=2)
-xline(2*T1,'k--',LineWidth=2)
-xline(2*T1+T2,'g--',LineWidth=2)
-xline(2*T1+T2+T1,'m--',LineWidth=2)
+xline(2*T1,'r--',LineWidth=2)
+xline(3*T1,'k--',LineWidth=2)
+xline(3*T1+T2,'g--',LineWidth=2)
+xline(3*T1+T2+T1,'m--',LineWidth=2)
+xline(3*T1+T2+2*T1,'m--',LineWidth=2,HandleVisibility='off')
 legend({'PAC','sig1','sig2','sig1 + noise','sig2 + noise'})
 
 
