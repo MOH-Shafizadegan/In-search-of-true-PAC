@@ -1,4 +1,4 @@
-function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_type)
+function out = tfInTrialGram(x1,x2,Fs,interval, step, f_theta, f_gamma, window_type, nbins, nperm)
     
     % x1: signal 1
     % x1: signal 2
@@ -30,7 +30,15 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_ty
         w1 = nf_ridrihaczek(x1(s-start_idx : s-end_idx), Fs, 1); 
         w2 = nf_ridrihaczek(x2(s-start_idx : s-end_idx), Fs, 1);
         
-        [MVL, f_high, f_low] = tfMVL(w1, w2, fGamma, thetaBand, 1:length(x1(s-start_idx : s-end_idx)));
+        f_high_idx = find(abs(w1.freqs - f_gamma(1)) < 5*1e-1) : find(abs(w1.freqs - f_gamma(end)) < 10*1e-1);
+        f_high = w1.freqs(f_high_idx);
+        Amp = sqrt(w1.power(f_high_idx,:));
+
+        f_low_idx = find(abs(w2.freqs - f_theta(1)) < 10*1e-1) : find(abs(w2.freqs - f_theta(end)) < 10*1e-1);
+        f_low = w2.freqs(f_low_idx);
+        Phase = w2.phase(f_low_idx, :);
+        
+        PAC = calc_MI(Phase(:, window_idx), Amp(:, window_idx), nbins, nperm);
         table = [table; mean(MVL, 2)'];
         
     end

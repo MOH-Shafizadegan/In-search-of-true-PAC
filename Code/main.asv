@@ -14,11 +14,11 @@ addnoise_var = 0.2;     % Additive noise to the couple signal which is
 
 T1=1; K_f_p1=1; K_f_a1=1; f_p1=5; f_a1=40; c_frac1=0; phi_c1 = rand()*2*pi;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c1, Fs);
-% sig1 = sig1 + addnoise_var*randn(1,length(sig1));
+sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
 T2=1; K_f_p2=1; K_f_a2=1; f_p2=9; f_a2=60; c_frac2=0; phi_c2 = rand()*2*pi;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, phi_c2, Fs);
-% sig2 = sig2 + addnoise_var*randn(1,length(sig2));
+sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
 n1_pow = mean(sig1.^2) * 10^(-SNR/10);
 n2_pow = mean(sig2.^2) * 10^(-SNR/10);
@@ -67,43 +67,36 @@ save_fig('./Results/Sig/', 'Synthesized Signal');
 % PAC Method:
 %     - New rid-rihaczek function (Neuro_Freq)
 %     - First windowing, then calculating tf-decomposition
-nbins = 18; nperm = 50;
-[PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs, nbins, nperm);
-PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs, nbins, nperm);
-PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs, nbins, nperm);
-PAC_mat_sig1_noisy = calc_PAC_mat(sig1_noisy, sig1_noisy, 2:13, 20:90, Fs, nbins, nperm);
-PAC_mat_sig2_noisy = calc_PAC_mat(sig2_noisy, sig2_noisy, 2:13, 20:90, Fs, nbins, nperm);
-
-%%
-
-[PAC_mat_noise, f_high, f_low] = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs, nbins, nperm);
-%%
-plot_comodulogram(PAC_mat_noise', f_high, f_low, [0 range])
-
+nbins = 18; nperm = 0;
+[PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs);
+PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs);
+PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs);
+PAC_mat_sig1_noisy = calc_PAC_mat(sig1_noisy, sig1_noisy, 2:13, 20:90, Fs);
+PAC_mat_sig2_noisy = calc_PAC_mat(sig2_noisy, sig2_noisy, 2:13, 20:90, Fs);
 
 %% PAC comodu Visualization
 
 range = max([max(max(PAC_mat_sig1)) max(max(PAC_mat_sig2)) max(max(PAC_mat_noise)) ...
              max(max(PAC_mat_sig1_noisy)) max(max(PAC_mat_sig2_noisy))])
 
-plot_comodulogram(PAC_mat_noise', f_high, f_low, [0 range])
+plot_comodulogram(PAC_mat_noise, f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-sig-randomNoise');
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig1', f_high, f_low, [0 range])
+plot_comodulogram(PAC_mat_sig1, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig2', f_high, f_low, [0 range])
+plot_comodulogram(PAC_mat_sig2, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig1_noisy', f_high, f_low, [0 range])
+plot_comodulogram(PAC_mat_sig1_noisy, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
 save_fig(save_path, fig_title);
 
-plot_comodulogram(PAC_mat_sig2_noisy', f_high, f_low, [0 range])
+plot_comodulogram(PAC_mat_sig2_noisy, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
 save_fig(save_path, fig_title);
 
