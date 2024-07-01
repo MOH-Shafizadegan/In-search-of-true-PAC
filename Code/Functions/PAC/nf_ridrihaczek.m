@@ -113,7 +113,7 @@ for eloc = 1:nChan
         if flag==1
             RID_Rih(:,end)=[]; %remove possible trailing point
         end
-        ridPowDat(eloc,:,:,trl) = abs( RID_Rih(1:numel(fout),:) ).^2;
+        ridPowDat(eloc,:,:,trl) = real( RID_Rih(1:numel(fout),:) );
         ridPhasDat(eloc,:,:,trl) = angle( RID_Rih(1:numel(fout),:) );
     end
     %track progress
