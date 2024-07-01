@@ -27,19 +27,19 @@ function out = tfInTrialGram(x1,x2,Fs,interval, step, f_theta, f_gamma, window_t
     table = [] ; 
     for s = s_range
         
-        w1 = nf_ridrihaczek(x1(s-start_idx : s-end_idx), Fs, 1); 
-        w2 = nf_ridrihaczek(x2(s-start_idx : s-end_idx), Fs, 1);
+        w1 = nf_ridrihaczek(x1(s-start_idx : s-end_idx), Fs, 1, [], 1); 
+        w2 = nf_ridrihaczek(x2(s-start_idx : s-end_idx), Fs, 1, [], 1);
         
         f_high_idx = find(abs(w1.freqs - f_gamma(1)) < 5*1e-1) : find(abs(w1.freqs - f_gamma(end)) < 10*1e-1);
         f_high = w1.freqs(f_high_idx);
-        Amp = sqrt(w1.power(f_high_idx,:));
+        Amp = w1.power(f_high_idx,:);
 
         f_low_idx = find(abs(w2.freqs - f_theta(1)) < 10*1e-1) : find(abs(w2.freqs - f_theta(end)) < 10*1e-1);
         f_low = w2.freqs(f_low_idx);
         Phase = w2.phase(f_low_idx, :);
         
-        PAC = calc_MI(Phase(:, window_idx), Amp(:, window_idx), nbins, nperm);
-        table = [table; mean(MVL, 2)'];
+        PAC = calc_MI(Phase, Amp, nbins, nperm);
+        table = [table; mean(PAC, 1)];
         
     end
         
