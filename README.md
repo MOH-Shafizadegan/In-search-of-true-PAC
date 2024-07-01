@@ -45,4 +45,11 @@ Discussing different methods of calculating Phase Amplitude Coupling
         - PAC in range [4,8] and [35, 45] is higher for second population
 
 
-    
+# Conclusion    
+- Each of these methods has their own pros and cons
+- Rid-rihaczek can decompose frequency more precicely than the CWT. The CWT will skew the freuqency axes
+- MVL method is biased with amplitude signal and power (Note the comodulograms)
+- MI requires signals long enough (more than 500 samples)
+- MVL may detect fake couplings too but works preciecly well with actual couplings
+- MVL doesn't require permutations test but using it may lead to better results espcially when we use CWT
+- Curerntly MVL is much faster than MI
