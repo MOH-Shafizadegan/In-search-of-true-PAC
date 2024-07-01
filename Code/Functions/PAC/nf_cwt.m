@@ -1,4 +1,4 @@
-function tfRes = nf_cwt(data,Fs,plt)
+function tfRes = nf_cwt(data,Fs, max_Freq, plt)
 % GENERAL
 % -------
 % Calculates time-frequency of an input dataset (1/2/3D) using matlab 
@@ -50,7 +50,7 @@ function tfRes = nf_cwt(data,Fs,plt)
 % 2/10/24 ER: made compatible with analytic signals
 
 %defaults
-if nargin<3 || isempty(plt)
+if nargin<4 || isempty(plt)
     plt=0;
 end
 if nargin<2 || isempty(Fs) || isempty(data)
@@ -69,11 +69,10 @@ end
 
 %make data long over trials
 data=reshape(data,nChan,nTimes*nTrls); %concatenate times
-
-%test run - figure out returned frequencies for preallocation
-% [~,f] = cwt(single(data(1,:)), Fs, 'amor', 'VoicesPerOctave', 32); %test frequencies
-
-[~,f] = cwt(single(data(1,:)), Fs, 'amor', 'VoicesPerOctave', 32); %test frequencies
+    
+fb = cwtfilterbank('Wavelet','amor','SignalLength',length(data(1,:)),'FrequencyLimits', ...
+                   [0, max_Freq],'SamplingFrequency',Fs,'VoicesPerOctave',32);
+[~,f] = cwt(single(data(1,:)), FilterBank=fb); %test frequencies
 
 cwtPow = zeros(nChan,numel(f),nTimes*nTrls); %preallocate
 cwtPhas = zeros(nChan,numel(f),nTimes*nTrls); %preallocate
@@ -83,7 +82,7 @@ for i=1:nChan
     %one sensor of data
     dataY=data(i,:);
     %continuous wavelet
-    [convDat,f] = cwt(single(dataY),Fs,'amor', 'VoicesPerOctave', 32);
+    [convDat,f] = cwt(single(dataY), FilterBank=fb);
     if isreal(dataY)
         cwtPow(i,:,:) = flipud(abs(convDat).^2);
         cwtPhas(i,:,:) = flipud(angle(convDat));
