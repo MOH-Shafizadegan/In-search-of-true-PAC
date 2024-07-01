@@ -14,11 +14,11 @@ addnoise_var = 0.2;     % Additive noise to the couple signal which is
 
 T1 = 1; K_f_p1 = 1; K_f_a1 = 1; f_p1 = 5; f_a1 = 40; c_frac1 = 0;
 sig1 = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, Fs);
-% sig1 = sig1 + addnoise_var*randn(1,length(sig1));
+sig1 = sig1 + addnoise_var*randn(1,length(sig1));
 
 T2 = 1; K_f_p2 = 1; K_f_a2 = 1; f_p2 = 9; f_a2 = 60; c_frac2 = 0;
 sig2 = generate_sig(T2, K_f_p2, K_f_a2, f_p2, f_a2, c_frac2, Fs);
-% sig2 = sig2 + addnoise_var*randn(1,length(sig2));
+sig2 = sig2 + addnoise_var*randn(1,length(sig2));
 
 n1_pow = mean(sig1.^2) * 10^(-SNR/10);
 n2_pow = mean(sig2.^2) * 10^(-SNR/10);
@@ -28,7 +28,7 @@ noise = max(n1_pow,n2_pow) * randn(1,length(sig1));
 sig1_noisy = sig1 + n1_pow * randn(1,length(sig1));
 sig2_noisy = sig2 + n2_pow * randn(1,length(sig2));
 
-signal = [noise noise sig1 sig2 sig1_noisy sig2_noisy noise noise];
+signal = [noise sig1 sig2 sig1_noisy sig2_noisy];
 
 %% Visualize signal
 
@@ -73,42 +73,41 @@ nbins = 18; nperm = 100;
 [PAC_mat_noise, f_high, f_low] = calc_PAC_mat(noise, noise, 2:13, 20:90, Fs, nbins, nperm);
 PAC_mat_sig1 = calc_PAC_mat(sig1, sig1, 2:13, 20:90, Fs, nbins, nperm);
 PAC_mat_sig2 = calc_PAC_mat(sig2, sig2, 2:13, 20:90, Fs, nbins, nperm);
+PAC_mat_nosiy_sig1 = calc_PAC_mat(sig1_noisy, sig1_noisy, 2:13, 20:90, Fs, nbins, nperm);
+PAC_mat_nosiy_sig2 = calc_PAC_mat(sig2_noisy, sig2_noisy, 2:13, 20:90, Fs, nbins, nperm);
 
 %% PAC comodu Visualization
 
-range = max([max(max(PAC_mat_sig1)) max(max(PAC_mat_sig2)) max(max(PAC_mat_noise))])
+range = max([max(max(PAC_mat_sig1)) max(max(PAC_mat_sig2)) max(max(PAC_mat_noise)) ...
+             max(max(PAC_mat_nosiy_sig1)) max(max(PAC_mat_nosiy_sig2))])
 
 plot_comodulogram(PAC_mat_noise', f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-sig-randomNoise');
-% save_fig(save_path, fig_title);
+title(fig_title)
+save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig1', f_high, f_low, [0 range])
-save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
-% save_fig(save_path, fig_title);
+title(fig_title)
+save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig2', f_high, f_low, [0 range])
-save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
-% save_fig(save_path, fig_title);
+title(fig_title)
+save_fig(save_path, fig_title);
+
+plot_comodulogram(PAC_mat_nosiy_sig1', f_high, f_low, [0 range])
+fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
+title(fig_title)
+save_fig(save_path, fig_title);
+
+plot_comodulogram(PAC_mat_nosiy_sig2', f_high, f_low, [0 range])
+fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
+title(fig_title)
+save_fig(save_path, fig_title);
 
 %% PAC dynamics
-
-% Checkout the new funcitons results
-
-twin = 0.8; % Window size in seconds
-tovp = 0.95; % Overlap percentage
-fph = [3,10]; % Phase frequency range
-famp = [20,100]; % Amplitude frequcny range
-method = 'wavelet';
-
-[PAC, time_PAC, fph_vec, famp_vec] = calc_PAC_varTime(signal,signal,Fs,fph,famp,twin,tovp,method,fres_param,nperm,nbins);
-
-% Getting mean over phase frequency
-PAC_m = squeeze(mean(PAC,2));
-
-%%
 
 interval = 0.2 * Fs -1;
 w_step = 0.1 * Fs;
@@ -123,34 +122,23 @@ PAC_dyn = mean(PAC.table, 2);
 
 %% Viusalize the PAC dynamic
 
-figure;
+figure('WindowState', 'maximized');
 tint = PAC.s / Fs * 1000;
-plot(tint, PAC_dyn, 'linewidth', 2);
+plot(tint, PAC_dyn, 'linewidth', 2); hold on;
+xline(0, 'r--'); xline(1000, 'g--'); xline(2000, 'b--');
+xline(3000, '--'); xline(4000, '--');
+legend('PAC dynamic', 'Start of gaussion noise signal', ...
+       strcat('coupled signal 1, fp=', num2str(f_p1), ', fa=', num2str(f_a1)), ...
+       strcat('coupled signal 2, fp=', num2str(f_p2), ', fa=', num2str(f_a2)), ...
+       'Coupled signal 1 with noise', 'coupled signal 2 with noise')
 xlabel('time');
 ylabel('PAC');
-xlim([0 5000])
+xlim([-100 5100])
+title('Detecting PAC in fp=[4,8], fa=[35, 45]')
 
 save_path = './Results/PAC_dyn/';
 fig_title = 'PAC-dyn-sig';
 save_fig(save_path, fig_title);
-
-%% Viusalize the PAC dynamics
-figure('Units','normalized','Position',[0.1, 0.2, 0.5, 0.5])
-pcolor(time_PAC, famp_vec, PAC_m')
-shading interp
-colormap jet
-colorbar
-xlabel('Time (s)')
-ylabel('f_{Amp} (Hz)')
-title("Dynamics of PAC (SNR="+SNR+"dB)")
-
-xline(2*T1,'r--',LineWidth=2)
-xline(3*T1,'k--',LineWidth=2)
-xline(3*T1+T2,'g--',LineWidth=2)
-xline(3*T1+T2+T1,'m--',LineWidth=2)
-xline(3*T1+T2+2*T1,'m--',LineWidth=2,HandleVisibility='off')
-legend({'PAC','sig1','sig2','sig1 + noise','sig2 + noise'})
-
 
 %% Statistical analysis
 
@@ -177,11 +165,9 @@ coupling1_PAC = zeros(sample_size, 1);
 coupling2_PAC = zeros(sample_size, 1);
 for i=1:sample_size
     PAC1 = tfInTrialGram(coupling1_sigs(i,:), coupling1_sigs(i,:), Fs, Fs-1,...
-                           1, theta_band, ...
-                           gamma_band, window_type);
+                           1, theta_band, gamma_band, window_type, nbins, nperm);
     PAC2 = tfInTrialGram(coupling2_sigs(i,:), coupling2_sigs(i,:), Fs, Fs-1,...
-                           1, theta_band, ...
-                           gamma_band, window_type);
+                           1, theta_band, gamma_band, window_type,  nbins, nperm);
     
     coupling1_PAC(i) = mean(PAC1.table, 2);
     coupling2_PAC(i) = mean(PAC2.table, 2);
