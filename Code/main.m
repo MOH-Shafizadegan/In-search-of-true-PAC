@@ -82,22 +82,27 @@ range = max([max(max(PAC_mat_sig1)) max(max(PAC_mat_sig2)) max(max(PAC_mat_noise
 plot_comodulogram(PAC_mat_noise, f_high, f_low, [0 range])
 save_path = './Results/PAC_comodu/';
 fig_title = strcat('PAC-comodu-sig-randomNoise');
+title(fig_title)
 save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig1, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
+title(fig_title)
 save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig2, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
+title(fig_title)
 save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig1_noisy, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p1), '-fa', num2str(f_a1));
+title(fig_title)
 save_fig(save_path, fig_title);
 
 plot_comodulogram(PAC_mat_sig2_noisy, f_high, f_low, [0 range])
 fig_title = strcat('PAC-comodu-synth-noisy-sig-fp', num2str(f_p2), '-fa', num2str(f_a2));
+title(fig_title)
 save_fig(save_path, fig_title);
 
 
@@ -119,13 +124,19 @@ PAC_dyn = mean(PAC.table, 2);
 
 %% Viusalize the PAC dynamic
 
-figure;
+figure('WindowState', 'maximized');
 tint = PAC.s / Fs * 1000;
-plot(tint, PAC_dyn, 'linewidth', 2);
+plot(tint, PAC_dyn, 'linewidth', 2); hold on;
+xline(0, 'r--'); xline(1000, 'g--'); xline(2000, 'b--');
+xline(3000, '--'); xline(4000, '--');
+legend('PAC dynamic', 'Start of gaussion noise signal', ...
+       strcat('coupled signal 1, fp=', num2str(f_p1), ', fa=', num2str(f_a1)), ...
+       strcat('coupled signal 2, fp=', num2str(f_p2), ', fa=', num2str(f_a2)), ...
+       'Coupled signal 1 with noise', 'coupled signal 2 with noise')
 xlabel('time');
 ylabel('PAC');
-xlim([0 5000])
-
+xlim([-100 5100])
+title('Detecting PAC in fp=[4,8], fa=[35, 45]')
 save_path = './Results/PAC_dyn/';
 fig_title = 'PAC-dyn-sig';
 save_fig(save_path, fig_title);
@@ -141,6 +152,7 @@ for i=1:sample_size
     K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([4, 7], 1);
     f_a1=randi([38, 42], 1); phi_c = rand()*2*pi; c_frac1=0;
     sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c, Fs);
+    sig = sig + addnoise_var*randn(1,length(sig));
     coupling1_sigs(i,:) = sig;
 end
 
@@ -151,6 +163,7 @@ for i=1:sample_size
     K_f_p1=randn(1); K_f_a1=randn(1); f_p1=randi([8, 11], 1);
     f_a1=randi([55, 65], 1); phi_c = rand()*2*pi; c_frac1=0;
     sig = generate_sig(T1, K_f_p1, K_f_a1, f_p1, f_a1, c_frac1, phi_c, Fs);
+    sig = sig + addnoise_var*randn(1,length(sig));
     coupling2_sigs(i,:) = sig;
 end
 

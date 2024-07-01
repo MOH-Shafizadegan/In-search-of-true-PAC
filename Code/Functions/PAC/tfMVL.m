@@ -11,7 +11,7 @@ function [tf_canolty, f_high, f_low] = tfMVL(w1,w2,high_freq,low_freq, window_id
 
     f_high_idx = find(abs(w1.freqs - high_freq(1)) < 5*1e-1) : find(abs(w1.freqs - high_freq(end)) < 10*1e-1);
     f_high = w1.freqs(f_high_idx);
-    Amp = sqrt(w1.power(f_high_idx,window_idx));
+    Amp = w1.power(f_high_idx,window_idx);
 
     f_low_idx = find(abs(w2.freqs - low_freq(1)) < 5*1e-1) : find(abs(w2.freqs - low_freq(end)) < 10*1e-1);
     f_low = w2.freqs(f_low_idx);

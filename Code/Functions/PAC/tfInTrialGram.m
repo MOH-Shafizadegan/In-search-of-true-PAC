@@ -27,8 +27,8 @@ function out = tfInTrialGram(x1,x2,Fs,interval,step,thetaBand, fGamma, window_ty
     table = [] ; 
     for s = s_range
         
-        w1 = nf_ridrihaczek(x1(s-start_idx : s-end_idx), Fs, 1); 
-        w2 = nf_ridrihaczek(x2(s-start_idx : s-end_idx), Fs, 1);
+        w1 = nf_ridrihaczek(x1(s-start_idx : s-end_idx), Fs, 1, [], 1); 
+        w2 = nf_ridrihaczek(x2(s-start_idx : s-end_idx), Fs, 1, [], 1);
         
         [MVL, f_high, f_low] = tfMVL(w1, w2, fGamma, thetaBand, 1:length(x1(s-start_idx : s-end_idx)));
         table = [table; mean(MVL, 2)'];
